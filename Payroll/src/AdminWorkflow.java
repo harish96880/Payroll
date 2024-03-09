@@ -65,13 +65,15 @@ public class AdminWorkflow {
 
         switch (dbChooseAdmin) {
             case 1:
-                System.out.println("Enter an operation to proceed: \n1.View \n2.Update");
+                System.out.println("Enter an operation to proceed: \n1.View \n2.Update \n3.Create");
                 System.out.print("Enter your choice: ");
                 int adminOperationEmployeeDetails = scanner.nextInt();
                 if(adminOperationEmployeeDetails == 1) {
                     viewEmployeeDetails();
                 } else if(adminOperationEmployeeDetails == 2) {
                     updateEmployeeDetails();
+                } else if(adminOperationEmployeeDetails == 3) {
+                    createEmployeeDetails();
                 }
                 break;
             // Add cases for other database operations
@@ -245,6 +247,74 @@ public class AdminWorkflow {
             System.out.println("SQL Exception: " + e.getMessage());
         }
     }
+
+    public void createEmployeeDetails() {
+        try (Scanner scanner = new Scanner(System.in)) {
+            System.out.println("Enter the following details for the new employee:");
+    
+            System.out.print("Employee ID: ");
+            int employeeId = scanner.nextInt();
+            scanner.nextLine();  // Consume newline character
+    
+            // Check if the employee ID already exists
+            if (isEmployeeIdExists(employeeId)) {
+                System.out.println("Employee ID already exists in the database.");
+                return;
+            }
+    
+            System.out.print("First Name: ");
+            String firstName = scanner.nextLine();
+    
+            System.out.print("Last Name: ");
+            String lastName = scanner.nextLine();
+    
+            System.out.print("Date of Birth (YYYY-MM-DD): ");
+            String dateOfBirth = scanner.nextLine();
+    
+            System.out.print("Gender (Male/Female): ");
+            String gender = scanner.nextLine();
+    
+            System.out.print("Phone Number: ");
+            String phoneNumber = scanner.nextLine();
+    
+            System.out.print("Email Address: ");
+            String emailAddress = scanner.nextLine();
+    
+            System.out.print("Address: ");
+            String address = scanner.nextLine();
+    
+            System.out.print("Joining Date (YYYY-MM-DD): ");
+            String joiningDate = scanner.nextLine();
+    
+            System.out.print("Department Designation: ");
+            String departmentDesignation = scanner.nextLine();
+    
+            // Insert new employee details into the database
+            String insertQuery = "INSERT INTO Employee_Details (Employee_Id, First_Name, Last_Name, Date_Of_Birth, Gender, "
+                    + "Phone_Number, Email_Address, Address, Joining_Date, Department_Designation) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(insertQuery);
+            preparedStatement.setInt(1, employeeId);
+            preparedStatement.setString(2, firstName);
+            preparedStatement.setString(3, lastName);
+            preparedStatement.setString(4, dateOfBirth);
+            preparedStatement.setString(5, gender);
+            preparedStatement.setString(6, phoneNumber);
+            preparedStatement.setString(7, emailAddress);
+            preparedStatement.setString(8, address);
+            preparedStatement.setString(9, joiningDate);
+            preparedStatement.setString(10, departmentDesignation);
+    
+            int rowsInserted = preparedStatement.executeUpdate();
+            if (rowsInserted > 0) {
+                System.out.println("Employee details added successfully!");
+            } else {
+                System.out.println("Failed to add employee details.");
+            }
+        } catch (SQLException e) {
+            System.out.println("SQL Exception: " + e.getMessage());
+        }
+    }
+    
     
 
     // Method to check if the Employee ID exists in the database
