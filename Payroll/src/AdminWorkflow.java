@@ -325,6 +325,4 @@ public class AdminWorkflow {
         ResultSet resultSet = preparedStatement.executeQuery();
         return resultSet.next();
     }
-
-    
 }
