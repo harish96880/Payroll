@@ -1,5 +1,7 @@
 import java.sql.*;
+import java.util.InputMismatchException;
 import java.util.Scanner;
+import java.util.NoSuchElementException;
 
 public class AdminWorkflow {
     private final Connection connection;
@@ -30,29 +32,39 @@ public class AdminWorkflow {
     private void displayAdminMenu(Scanner scanner) throws SQLException {
         boolean isValidChoice = false;
         while (!isValidChoice) {
-            System.out.println("\nChoose an operation to proceed:");
-            System.out.println("1. Database Operations");
-            System.out.println("2. Generate Payslip");
-            System.out.println("3. Exit");
-            System.out.print("Enter your choice: ");
-            int adminPortalChoose = scanner.nextInt();
-
-            switch (adminPortalChoose) {
-                case 1:
-                    handleDatabaseOperations(scanner);
-                    break;
-                case 2:
-                    // Implement generate payslip functionality
-                    break;
-                case 3:
-                    System.out.println("Exiting...");
-                    isValidChoice = true;
-                    break;
-                default:
-                    System.out.println("Invalid choice. Please try again.");
+            try {
+                System.out.println("\nChoose an operation to proceed:");
+                System.out.println("1. Database Operations");
+                System.out.println("2. Generate Payslip");
+                System.out.println("3. Exit");
+                System.out.print("Enter your choice: ");
+    
+                int adminPortalChoose = scanner.nextInt();
+                scanner.nextLine(); // Consume newline character
+                switch (adminPortalChoose) {
+                    case 1:
+                        handleDatabaseOperations(scanner);
+                        break;
+                    case 2:
+                        // Implement generate payslip functionality
+                        break;
+                    case 3:
+                        System.out.println("Exiting...");
+                        isValidChoice = true;
+                        break;
+                    default:
+                        System.out.println("Invalid choice. Please try again.");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter a valid integer choice.");
+                scanner.nextLine(); // Consume invalid input to prevent infinite loop
+            } catch (NoSuchElementException e) {
+                System.out.println("No input detected. Please try again.");
+                scanner.nextLine(); // Consume invalid input to prevent infinite loop
             }
         }
     }
+    
 
     private void handleDatabaseOperations(Scanner scanner) throws SQLException {
         System.out.println("\nChoose database to proceed:");
@@ -315,8 +327,6 @@ public class AdminWorkflow {
         }
     }
     
-    
-
     // Method to check if the Employee ID exists in the database
     private boolean isEmployeeIdExists(int employeeId) throws SQLException {
         String query = "SELECT * FROM Employee_Details WHERE Employee_Id = ?";
