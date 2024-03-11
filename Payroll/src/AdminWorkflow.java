@@ -46,7 +46,8 @@ public class AdminWorkflow {
                         handleDatabaseOperations(scanner);
                         break;
                     case 2:
-                        // Implement generate payslip functionality
+                        PayslipGenerator pGenerator = new PayslipGenerator(connection);
+                        pGenerator.generatePayslip(1001);
                         break;
                     case 3:
                         System.out.println("Exiting...");
@@ -60,38 +61,46 @@ public class AdminWorkflow {
                 scanner.nextLine(); // Consume invalid input to prevent infinite loop
             } catch (NoSuchElementException e) {
                 System.out.println("No input detected. Please try again.");
-                scanner.nextLine(); // Consume invalid input to prevent infinite loop
+                // scanner.nextLine(); // Consume invalid input to prevent infinite loop
+                isValidChoice = true;
             }
         }
     }
     
 
     private void handleDatabaseOperations(Scanner scanner) throws SQLException {
+
+        boolean continueMenu = true;
+    while (continueMenu) {
         System.out.println("\nChoose database to proceed:");
         System.out.println("1. Employee Details");
         System.out.println("2. Salary Details");
         System.out.println("3. Salary Structure");
         System.out.println("4. Leave Records");
+        System.out.println("5. Exit");
         System.out.print("Enter your Choice: ");
         int dbChooseAdmin = scanner.nextInt();
-
         switch (dbChooseAdmin) {
             case 1:
                 System.out.println("Enter an operation to proceed: \n1.View \n2.Update \n3.Create");
                 System.out.print("Enter your choice: ");
                 int adminOperationEmployeeDetails = scanner.nextInt();
-                if(adminOperationEmployeeDetails == 1) {
+                if (adminOperationEmployeeDetails == 1) {
                     viewEmployeeDetails();
-                } else if(adminOperationEmployeeDetails == 2) {
+                } else if (adminOperationEmployeeDetails == 2) {
                     updateEmployeeDetails();
-                } else if(adminOperationEmployeeDetails == 3) {
+                } else if (adminOperationEmployeeDetails == 3) {
                     createEmployeeDetails();
                 }
                 break;
-            // Add cases for other database operations
+            case 5:
+                System.out.println("Exiting...");
+                continueMenu = false; // Exit the menu loop
+                break;
             default:
                 System.out.println("Invalid choice. Please try again.");
         }
+    }
     }
 
     private void viewEmployeeDetails() throws SQLException {
