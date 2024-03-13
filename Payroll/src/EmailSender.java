@@ -1,44 +1,48 @@
 import javax.mail.*;
-import javax.mail.internet.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import java.util.Properties;
 
 public class EmailSender {
-    private String fromEmail;
-    private String password;
-    private String host;
-    private int port;
+    private final String username;
+    private final String password;
+    private final String smtpHost;
+    private final int port;
 
-    public EmailSender(String fromEmail, String password, String host, int port) {
-        this.fromEmail = fromEmail;
+    public EmailSender(String username, String password, String smtpHost, int port) {
+        this.username = username;
         this.password = password;
-        this.host = host;
+        this.smtpHost = smtpHost;
         this.port = port;
     }
 
-    public void sendEmail(String toEmail, String subject, String messageText) {
-        Properties props = new Properties();
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", host);
-        props.put("mail.smtp.port", port);
-
-        Session session = Session.getInstance(props, new Authenticator() {
-            @Override
+    public Session getSession() {
+        Properties properties = new Properties();
+        properties.put("mail.smtp.auth", "true");
+        properties.put("mail.smtp.starttls.enable", "true");
+        properties.put("mail.smtp.host", smtpHost);
+        properties.put("mail.smtp.port", port);
+        return Session.getInstance(properties, new Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(fromEmail, password);
+                return new PasswordAuthentication(username, password);
             }
         });
+    }
 
+    public void sendEmail(String toEmail, String subject, MimeMessage message) throws MessagingException {
+        Transport transport = null;
         try {
-            Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(fromEmail));
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
+            Session session = getSession();
+            transport = session.getTransport("smtp");
+            transport.connect(smtpHost, port, username, password);
+            message.setRecipient(Message.RecipientType.TO, new InternetAddress(toEmail));
             message.setSubject(subject);
-            message.setText(messageText);
-            Transport.send(message);
-            System.out.println("Email sent successfully to " + toEmail);
-        } catch (MessagingException e) {
-            e.printStackTrace();
+            // Send the message
+            transport.sendMessage(message, message.getAllRecipients());
+        } finally {
+            if (transport != null) {
+                transport.close();
+            }
         }
     }
 }
